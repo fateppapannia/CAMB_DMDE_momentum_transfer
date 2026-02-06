@@ -43,6 +43,8 @@ If you use this code in scientific work, please cite at least the first referenc
   
 - D\. Figueruelo, "Restrictions in the dark sector of the universe and modified gravity with large scale structure and gravitational waves" `PhD Thesis <https://inspirehep.net/literature/2722259>`_ (2023).
   
+The model was first introduced in:
+
 - M\. Asghari, J. Beltrán Jiménez, S. Khosravi & D.F. Mota, "On structure formation from a small-scales-interacting dark sector" (`arXiv:1902.05532  <https://arxiv.org/abs/1902.05532>`_). 
 
 Contact
