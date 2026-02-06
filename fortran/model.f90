@@ -132,6 +132,9 @@
         ! _tensor settings only used in initialization,
         !Max_l and Max_eta_k are set to the tensor variables if only tensors requested
 
+        !--- DMDE: dimensionless parameters for DE/DM elastic interaction (wCDM default)
+        real(dl)  :: alphaDMDE = 0._dl 
+        !---
         real(dl)  :: ombh2 = 0._dl !baryon density Omega_b h^2
         real(dl)  :: omch2 = 0._dl !cold dark matter density Omega_c h^2
         real(dl)  :: omk = 0._dl !Omega_K

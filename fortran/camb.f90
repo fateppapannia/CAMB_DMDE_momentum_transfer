@@ -416,6 +416,9 @@
     end if
     call P%DarkEnergy%ReadParams(Ini)
 
+    !--- DMDE: read dimensionless parameter for DM-DE momentum transfer:
+    P%alphaDMDE = Ini%Read_Double('alphaDMDE', 0.d0) ! (wCDM default)
+
     P%h0 = Ini%Read_Double('hubble')
 
     if (Ini%Read_Logical('use_physical', .true.)) then

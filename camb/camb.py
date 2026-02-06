@@ -279,6 +279,7 @@ def set_params_cosmomc(
     pars.Reion.set_extra_params(deltazrei=p.get("deltazrei", None))
     pars.set_cosmology(
         H0=p["H0"],
+        alphaDMDE=p["alphaDMDE", 0.], # DMDE momentum transfer
         ombh2=p["omegabh2"],
         omch2=p["omegach2"],
         mnu=p.get("mnu", 0.06),

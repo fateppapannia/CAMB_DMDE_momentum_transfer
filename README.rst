@@ -1,83 +1,56 @@
-===================
-CAMB
-===================
-:CAMB: Code for Anisotropies in the Microwave Background
-:Author: Antony Lewis and Anthony Challinor
-:Homepage: https://camb.info/
+===================================================================
+CAMB Extension for Dark Matter–Dark Energy Momentum Transfer Model
+===================================================================
 
-.. image:: https://img.shields.io/pypi/v/camb.svg?style=flat
-   :target: https://pypi.python.org/pypi/camb/
-.. image:: https://img.shields.io/conda/vn/conda-forge/camb.svg
-   :target: https://anaconda.org/conda-forge/camb
-.. image:: https://readthedocs.org/projects/camb/badge/?version=latest
-   :target: https://camb.readthedocs.io/en/latest
-.. image:: https://github.com/cmbant/camb/actions/workflows/tests.yml/badge.svg?branch=master
-  :target: https://github.com/cmbant/CAMB/actions
-.. image:: https://mybinder.org/badge_logo.svg
-  :target: https://mybinder.org/v2/gh/cmbant/CAMB/HEAD?filepath=docs%2FCAMBdemo.ipynb
+Author: **Florencia Anabella Teppa Pannia**.
 
-Description and installation
-=============================
+This repository contains a modified version of CAMB implementing 
+a dark matter–dark energy (DM–DE) momentum transfer model, based on a series of peer-reviewed publications and a doctoral thesis. Any scientific use of this code requires citation of at least the first reference listed in the Citations section below.
 
-CAMB is a cosmology code for calculating cosmological observables, including
-CMB, lensing, source count and 21cm angular power spectra, matter power spectra, transfer functions
-and background evolution. The code is in Python, with numerical code implemented in fast modern Fortran.
+Credits and Licence
+=================================
 
-See the `CAMB python example notebook <https://camb.readthedocs.io/en/latest/CAMBdemo.html>`_ for a
-quick introduction to how to use the CAMB Python package.
+This repository is a fork of CAMB (v.1.6.5): Code for Anisotropies in the Microwave Background, developed by Antony Lewis and Anthony Challinor (https://camb.info/).
 
-For a standard non-editable installation use::
+Original CAMB repository: https://github.com/cmbant/CAMB
 
-    pip install camb [--user]
+All original CAMB licensing, structure, and philosophy are preserved.
 
-The --user is optional and only required if you don't have write permission to your main python installation.
-To install from source, clone from github using::
+Description
+==============================
+*CAMB DM-DE momentum transfer* is a modified version of CAMB for computing cosmological perturbations with dark matter-dark energy momentum transfer. The physical model describes an elastic scattering (momentum transfer) interaction between Dark Matter and Dark Energy, following the theoretical framework developed in the references listed in the Citations section.
 
-    git clone --recursive https://github.com/cmbant/CAMB
+The model assumes a dynamical dark energy component with EoS parameter w≠1. The stregth of the interaction is quantified by the model parameter *alpaDMDE*, which should be specify as an extra cosmological parameter. The interaction modifies the velocity equations of DE and DM components at the level of linear perturbations. 
 
-Then install using::
+All modifications are indicated in the code with the flag *DMDE*. Most of the original schemes are kept commented out for ease of comparison.
 
-    pip install -e ./CAMB [--user]
+The results presented in the papers listed in the Citations section below were obtained using `CAMB v.1.0.7 <https://github.com/cmbant/CAMB/releases/tag/1.0.7>`_ (Jul 31, 2019) and `CosmoMC <https://github.com/cmbant/CosmoMC>`_. All the modifications were migrated to the current version v.1.6.5 for better compatibility with `Cobaya <https://cobaya.readthedocs.io/en/latest/index.html>`_. 
 
-For development, install with dev dependencies and setup pre-commit hooks::
+A modified CLASS version for the same model by D. Figueruelo is also available at
+https://github.com/david-figuer/CLASS_momentum_transfer
 
-    pip install -e ./CAMB[dev] [--user]
-    pre-commit install
+Citations (mandatory)
+=================================
+If you use this code in scientific work, please cite at least the first reference below. Additional citations are strongly encouraged when relevant.
 
-See `CONTRIBUTING.md <CONTRIBUTING.md>`_ for full development setup instructions.
+   * D. Figueruelo, M. Aparicio Resco, F. A. Teppa Pannia, et al. , "J-PAS: forecasts for dark matter-dark energy elastic couplings" (`arXiv:2103.01571 <https://arxiv.org/abs/2103.01571>`_)
 
-You will need gfortran 6 or higher installed to compile (usually included with gcc by default).
-If you have gfortran installed, "python setup.py make" (and other standard setup commands) will build the Fortran
-library on all systems (including Windows without directly using a Makefile).
+   * J. Beltrán Jiménez, D. Bettoni, D. Figueruelo, F. A. Teppa Pannia & S. Tsujikawa, "Probing elastic interactions in the dark sector and the role of 𝑆8" (`arXiv:2106.11222 <https://arxiv.org/abs/2106.11222>`_)
 
-The python wrapper provides a module called "camb" documented in the Python `CAMB documentation <https://camb.readthedocs.io/en/latest/>`_.
+   * J. Beltrán Jiménez, D. Figueruelo, F. A. Teppa Pannia, "Nondegeneracy of massive neutrinos and elastic interactions in the dark sector" (`arXiv:2403.03216 <https://arxiv.org/abs/2403.03216v1>`_); and
 
-After installation you can also run CAMB from the command line reading parameters from a .ini file, e.g.::
+   * J. Beltrán Jiménez, D. Bettoni, D. Figueruelo, F. A. Teppa Pannia, "On evidence for elastic interactions in the dark sector" (`arXiv2410.18645 <https://arxiv.org/abs/2410.18645>`_).
 
-  camb inifiles/planck_2018.ini
+   * D. Figueruelo, "Restrictions in the dark sector of the universe and modified gravity with large scale structure and gravitational waves" `PhD Thesis <https://inspirehep.net/literature/2722259>`_ (2023)
 
-To compile the Fortran command-line code run "make camb" in the fortran directory. For full details
-see the  `ReadMe <https://camb.info/readme.html>`_.
+   * M. Asghari, J. Beltrán Jiménez, S. Khosravi & D.F. Mota, "On structure formation from a small-scales-interacting dark sector" (`arXiv:1902.05532  <https://arxiv.org/abs/1902.05532>`_). 
 
-Branches
-=============================
+Contact
+=======
 
-The master branch contains latest changes to the main release version.
+Author: **Florencia Anabella Teppa Pannia**.
 
-There is a test suite, which runs automatically on GitHub actions for new commits and pull requests.
-Reference results and test outputs are stored in the `test outputs repository <https://github.com/cmbant/CAMB_test_outputs/>`_. Tests can also be run locally.
+For questions, collaborations or issues, please open a GitHub issue 
+or contact the author directly to fa.teppa.pannia@upm.es 
 
-To reproduce legacy results, see these branches:
-
- - *CAMB_sources* is the old public `CAMB Sources <https://camb.info/sources/>`_ code.
- - *CAMB_v0* is the old Fortran-oriented (gfortran 4.8-compatible) version as used by the Planck 2018 analysis.
- - *rayleigh* includes frequency-dependent Rayleigh scattering
- - *python2* is the last Python 2 compatible version
-
-===================
-
-.. raw:: html
-
-    <a href="https://www.sussex.ac.uk/astronomy/"><img src="https://cdn.cosmologist.info/antony/Sussex_white.svg" style="height:200px" height="200px"></a>
-    <a href="https://erc.europa.eu/"><img src="https://cdn.cosmologist.info/antony/ERC_white.svg" style="height:200px" height="200px"></a>
-    <a href="https://stfc.ukri.org/"><img src="https://cdn.cosmologist.info/antony/STFC_white.svg" style="height:200px" height="200px"></a>
+     

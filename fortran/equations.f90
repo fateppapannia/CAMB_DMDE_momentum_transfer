@@ -43,8 +43,9 @@
 
     logical, parameter :: plot_evolve = .false. !for outputing time evolution
 
-    integer, parameter :: basic_num_eqns = 4
+    integer, parameter :: basic_num_eqns = 5 ! DMDE extra eqn for vc (default = 4)
     integer, parameter :: ix_etak=1, ix_clxc=2, ix_clxb=3, ix_vb=4 !Scalar array indices for each quantity
+    integer, parameter :: ix_vc=5 ! DMDE new index for vc
     integer, parameter :: ixt_H = 1, ixt_shear = 2 !tensor indices
 
     logical :: DoTensorNeutrinos = .true.
@@ -1770,7 +1771,8 @@
     integer l,i, nu_i, j, ind
     integer, parameter :: i_clxg=1,i_clxr=2,i_clxc=3, i_clxb=4, &
         i_qg=5,i_qr=6,i_vb=7,i_pir=8, i_eta=9, i_aj3r=10,i_clxde=11,i_vde=12
-    integer, parameter :: i_max = i_vde
+    integer, parameter :: i_vc=13 ! DMDE
+    integer, parameter :: i_max = i_vc ! DMDE (default: i_max=i_vde)
     real(dl) initv(6,1:i_max), initvec(1:i_max)
 
     nullify(EV%OutputTransfer) !Should not be needed, but avoids issues in ifort 14
@@ -1854,6 +1856,7 @@
     initv(1,i_qg)=initv(1,i_clxg)*x/9._dl
     initv(1,i_qr)=-chi*EV%Kf(1)*(4*Rv+23)/Rp15*x3/27
     initv(1,i_vb)=0.75_dl*initv(1,i_qg)
+    initv(1,i_vc)=0._dl ! DMDE 
     initv(1,i_pir)=chi*4._dl/3*x2/Rp15*(1+omtau/4*(4*Rv-5)/(2*Rv+15))
     initv(1,i_aj3r)=chi*4/21._dl/Rp15*x3
     initv(1,i_eta)=-chi*2*EV%Kf(1)*(1 - x2/12*(-10._dl/Rp15 + EV%Kf(1)))
@@ -1868,6 +1871,7 @@
         initv(2,i_qg)=-Rc/9*omtau*x
         initv(2,i_qr)=initv(2,i_qg)
         initv(2,i_vb)=0.75_dl*initv(2,i_qg)
+        initv(2,i_vc)=0._dl ! DMDE 
         initv(2,i_pir)=-Rc*omtau*x2/3/(2*Rv+15._dl)
         initv(2,i_eta)= Rc*omtau*(1._dl/3 - omtau/8)*EV%Kf(1)
         initv(2,i_aj3r)=0
@@ -1888,6 +1892,7 @@
         initv(4,i_qg) =iqg
         initv(4,i_qr) = x/3
         initv(4,i_vb)=0.75_dl*iqg
+        initv(4,i_vc)=0._dl ! DMDE 
         initv(4,i_pir)=x2/Rp15
         initv(4,i_eta)=EV%Kf(1)*Rv/Rp15/3*x2
 
@@ -1901,6 +1906,7 @@
         initv(5,i_qg) =iqg
         initv(5,i_qr) = 1 - x2/6*(1+4*EV%Kf(1)/(4*Rv+5))
         initv(5,i_vb)=0.75_dl*iqg
+        initv(5,i_vc)=0._dl ! DMDE 
         initv(5,i_pir)=2*x/(4*Rv+5)+omtau*x*6/Rp15/(4*Rv+5)
         initv(5,i_eta)=2*EV%Kf(1)*x*Rv/(4*Rv+5) + omtau*x*3*EV%Kf(1)*Rv/32*(Rb/Rg - 80/Rp15/(4*Rv+5))
         initv(5,i_aj3r) = 3._dl/7*x2/(4*Rv+5)
@@ -1924,6 +1930,7 @@
 
     !  CDM
     y(ix_clxc)=InitVec(i_clxc)
+    y(ix_vc)=InitVec(i_vc) ! DMDE
 
     !  Baryons
     y(ix_clxb)=InitVec(i_clxb)
@@ -2139,7 +2146,7 @@
 
     subroutine derivs(EV,n,tau,ay,ayprime)
     !  Evaluate the time derivatives of the scalar perturbations
-    use constants, only : barssc0, Compton_CT, line21_const
+    use constants, only : barssc0, Compton_CT, line21_const, c ! DMDE
     use MassiveNu
     use Recombination, only : CB1
     implicit none
@@ -2159,6 +2166,7 @@
     real(dl) gpres_noDE !Pressure with matter and radiation, no dark energy
     real(dl) qgdot,qrdot,pigdot,pirdot,vbdot,dgrho,adotoa
     real(dl) a,a2,z,clxc,clxb,vb,clxg,qg,pig,clxr,qr,pir
+    real(dl) vcdot,vc ! DMDE
     real(dl) E2, dopacity
     integer l,i,ind, ind2, off_ix, ix
     real(dl) dgs,sigmadot,dz
@@ -2177,6 +2185,8 @@
     real(dl) ddopacity, visibility, dvisibility, ddvisibility, exptau, lenswindow
     real(dl) ISW, quadrupole_source, doppler, monopole_source, tau0, ang_dist
     real(dl) dgrho_de, dgq_de, cs2_de
+    real(dl) h2 ! DMDE
+    real(dl) RGamma_alpha, Gamma_alpha ! DMDE
 
     k=EV%k_buf
     k2=EV%k2_buf
@@ -2193,6 +2203,7 @@
 
     !  CDM variables
     clxc=ay(ix_clxc)
+    vc=ay(ix_vc) ! DMDE
 
     !  Baryon variables
     clxb=ay(ix_clxb)
@@ -2215,7 +2226,8 @@
     !  8*pi*a*a*SUM[rho_i*clx_i]
     dgrho_matter=grhob_t*clxb+grhoc_t*clxc
     !  8*pi*a*a*SUM[(rho_i+p_i)*v_i]
-    dgq=grhob_t*vb
+    !dgq=grhob_t*vb             ! DMDE (default wCDM)
+    dgq=grhob_t*vb + grhoc_t*vc ! DMDE momentum transfer
 
     gpres_nu=0
     grhonu_t=0
@@ -2301,12 +2313,21 @@
         ayprime(ix_etak)=0.5_dl*dgq + State%curv*z
     end if
 
+    !--- DMDE 
+    h2=(State%CP%H0/100)**2
+    Gamma_alpha = State%CP%alphaDMDE * State%CP%H0 * a**4 / (State%CP%omch2/h2)  * (1000./c ) 
+    RGamma_alpha = Gamma_alpha * (State%CP%omch2/h2) / (State%Omega_de) /(1.+w_dark_energy_t ) * a**(3.*w_dark_energy_t)
+    
     if (.not. EV%is_cosmological_constant) &
-        call State%CP%DarkEnergy%PerturbationEvolve(ayprime, w_dark_energy_t, &
-        EV%w_ix, a, adotoa, k, z, ay)
+         !call State%CP%DarkEnergy%PerturbationEvolve(ayprime,w_dark_energy_t,EV%w_ix,&
+         !a, adotoa, k, z, ay) ! default wCDM
+         call State%CP%DarkEnergy%PerturbationEvolve_DMDE(ayprime,w_dark_energy_t,EV%w_ix,&
+         ix_vc, RGamma_alpha, a, adotoa, k, z, ay) ! DMDE momentum transfer
+    !---
 
     !  CDM equation of motion
-    clxcdot=-k*z
+    !clxcdot=-k*z !default wCDM
+    clxcdot=-k*(z+vc) ! DMDE     
     ayprime(ix_clxc)=clxcdot
 
     !  Baryon equation of motion.
@@ -2396,6 +2417,11 @@
     end if
 
     ayprime(ix_vb)=vbdot
+
+    !--- DMDE:
+    vcdot = -adotoa * vc + Gamma_alpha * (ay(EV%w_ix+1) - vc) 
+    ayprime(ix_vc)=vcdot
+    !
 
     if (.not. EV%no_phot_multpoles) then
         !  Photon equations of motion
@@ -2704,9 +2730,12 @@
             EV%OutputTransfer(Transfer_tot_de) =  dgrho/grho_matter
             !Transfer_Weyl is k^2Phi, where Phi is the Weyl potential
             EV%OutputTransfer(Transfer_Weyl) = k2*phi
-            EV%OutputTransfer(Transfer_Newt_vel_cdm)=  -k*sigma/adotoa
+            !EV%OutputTransfer(Transfer_Newt_vel_cdm)= -k*sigma/adotoa ! default wCDM
+            EV%OutputTransfer(Transfer_Newt_vel_cdm)= -k*(vc+ sigma)/adotoa ! DMDE
             EV%OutputTransfer(Transfer_Newt_vel_baryon) = -k*(vb + sigma)/adotoa
-            EV%OutputTransfer(Transfer_vel_baryon_cdm) = vb
+            !EV%OutputTransfer(Transfer_vel_baryon_cdm) = vb ! default wCDM
+            EV%OutputTransfer(Transfer_vel_baryon_cdm) = vb - vc ! DMDE
+           
             if (State%CP%do21cm) then
                 Tspin = State%CP%Recomb%T_s(a)
                 xe = State%CP%Recomb%x_e(a)

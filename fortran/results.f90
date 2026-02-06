@@ -567,6 +567,9 @@
     if (present(error)) then
         error = 0
     else if (FeedbackLevel > 0 .and. .not. calling_again) then
+        !---DMDE (optional)
+        write(*,'("alphaDMDE            = ",f9.6)') P%alphaDMDE
+        !---
         write(*,'("Om_b h^2             = ",f9.6)') P%ombh2
         write(*,'("Om_c h^2             = ",f9.6)') P%omch2
         write(*,'("Om_nu h^2            = ",f9.6)') P%omnuh2

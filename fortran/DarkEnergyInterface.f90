@@ -16,6 +16,7 @@
     procedure :: diff_rhopi_Add_Term
     procedure :: PerturbationInitial
     procedure :: PerturbationEvolve
+    procedure :: PerturbationEvolve_DMDE ! DMDE
     procedure :: PrintFeedback
     ! do not have to implement w_de or grho_de if BackgroundDensityAndPressure is inherited directly
     procedure :: w_de => TDarkEnergyModel_w_de
@@ -147,6 +148,17 @@
     real(dl), intent(in) :: a,adotoa, k, z, y(:), w
     integer, intent(in) :: w_ix
     end subroutine PerturbationEvolve
+
+    !DMDE:
+    subroutine PerturbationEvolve_DMDE(this, ayprime, w, w_ix, &
+         ix_vc, RGamma_alpha, a, adotoa, k, z, y)
+      class(TDarkEnergyModel), intent(in) :: this
+      real(dl), intent(inout) :: ayprime(:)
+      real(dl), intent(in) :: a,adotoa, k, z, y(:), w
+      real(dl), intent(in) :: RGamma_alpha! DMDE
+      integer, intent(in) :: ix_vc ! DMDE
+      integer, intent(in) :: w_ix
+    end subroutine PerturbationEvolve_DMDE
 
     subroutine PerturbationInitial(this, y, a, tau, k)
     class(TDarkEnergyModel), intent(in) :: this

@@ -299,6 +299,7 @@ class CAMBparams(F2003Class):
         ("max_l_tensor", c_int, "l_max for the tensor C_L"),
         ("max_eta_k", c_double, "Maximum k*eta_0 for scalar C_L, where eta_0 is the conformal time today"),
         ("max_eta_k_tensor", c_double, "Maximum k*eta_0 for tensor C_L, where eta_0 is the conformal time today"),
+        ("alphaDMDE", c_double, "alphaDMDE"), # DMDE
         ("ombh2", c_double, "Omega_baryon h^2"),
         ("omch2", c_double, "Omega_cdm h^2"),
         ("omk", c_double, "Omega_K"),
@@ -603,6 +604,7 @@ class CAMBparams(F2003Class):
     def set_cosmology(
         self,
         H0: float | None = None,
+        alphaDMDE = 0., #DMDE 
         ombh2=0.022,
         omch2=0.12,
         omk=0.0,
@@ -641,6 +643,7 @@ class CAMBparams(F2003Class):
 
         :param H0: Hubble parameter today in km/s/Mpc. Can leave unset and instead set thetastar or cosmomc_theta
                   (which solves for the required H0).
+        :param alphaDMDE: DM-DE momentum transger parameter (alphaDMDE=0 is wCDM)         
         :param ombh2: physical density in baryons
         :param omch2:  physical density in cold dark matter
         :param omk: Omega_K curvature parameter
@@ -688,6 +691,7 @@ class CAMBparams(F2003Class):
             YHe = self.bbn_predictor.Y_He(ombh2 * (constants.COBE_CMBTemp / TCMB) ** 3, nnu - standard_neutrino_neff)
         self.YHe = YHe
         self.TCMB = TCMB
+        self.alphaDMDE = alphaDMDE # DMDE
         self.ombh2 = ombh2
         self.omch2 = omch2
         self.Alens = Alens

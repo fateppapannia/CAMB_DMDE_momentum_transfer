@@ -15,7 +15,8 @@
     procedure, nopass :: SelfPointer => TDarkEnergyFluid_SelfPointer
     procedure :: Init =>TDarkEnergyFluid_Init
     procedure :: PerturbedStressEnergy => TDarkEnergyFluid_PerturbedStressEnergy
-    procedure :: PerturbationEvolve => TDarkEnergyFluid_PerturbationEvolve
+    !procedure :: PerturbationEvolve => TDarkEnergyFluid_PerturbationEvolve
+    procedure :: PerturbationEvolve_DMDE => TDarkEnergyFluid_PerturbationEvolve ! DMDE
     end type TDarkEnergyFluid
 
     !Example implementation of fluid model using specific analytic form
@@ -113,16 +114,19 @@
     end if
     end subroutine TDarkEnergyFluid_PerturbedStressEnergy
 
-
+    ! DMDE :
     subroutine TDarkEnergyFluid_PerturbationEvolve(this, ayprime, w, w_ix, &
-        a, adotoa, k, z, y)
+         ix_vc, RGamma_alpha, a, adotoa, k, z, y)
     class(TDarkEnergyFluid), intent(in) :: this
     real(dl), intent(inout) :: ayprime(:)
     real(dl), intent(in) :: a, adotoa, w, k, z, y(:)
+    real(dl), intent(in) :: RGamma_alpha ! DMDE
+    integer, intent(in) :: ix_vc ! DMDE
     integer, intent(in) :: w_ix
     real(dl) Hv3_over_k, loga
 
     Hv3_over_k =  3*adotoa* y(w_ix + 1) / k
+    
     !density perturbation
     ayprime(w_ix) = -3 * adotoa * (this%cs2_lam - w) *  (y(w_ix) + (1 + w) * Hv3_over_k) &
         -  (1 + w) * k * y(w_ix + 1) - (1 + w) * k * z
@@ -135,17 +139,23 @@
     elseif (this%wa/=0) then
         ayprime(w_ix) = ayprime(w_ix) + Hv3_over_k*this%wa*adotoa*a
     end if
+     
     !velocity
     if (abs(w+1) > 1e-6) then
-        ayprime(w_ix + 1) = -adotoa * (1 - 3 * this%cs2_lam) * y(w_ix + 1) + &
-            k * this%cs2_lam * y(w_ix) / (1 + w)
+       ! default wCDM: 
+       !ayprime(w_ix + 1) = -adotoa * (1 - 3 * this%cs2_lam) * y(w_ix + 1) + &
+       !     k * this%cs2_lam * y(w_ix) / (1 + w)
+       ! DMDE momentum transfer:
+       ayprime(w_ix + 1) = -adotoa * (1 - 3 * this%cs2_lam) * y(w_ix + 1) + &
+            k * this%cs2_lam * y(w_ix) / (1 + w) &
+            - RGamma_alpha * (y(w_ix + 1)- y(ix_vc))
+       
     else
         ayprime(w_ix + 1) = 0
     end if
 
     end subroutine TDarkEnergyFluid_PerturbationEvolve
-
-
+    !----
 
     subroutine TAxionEffectiveFluid_ReadParams(this, Ini)
     use IniObjects
